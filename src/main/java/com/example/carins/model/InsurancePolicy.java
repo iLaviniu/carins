@@ -28,6 +28,10 @@ public class InsurancePolicy {
     @Column(nullable = false)                  //database level
     private LocalDate endDate;
 
+
+    @Column(nullable = false)
+    private boolean expiryLogged = false; // defaults to false
+
     public InsurancePolicy() {}
     public InsurancePolicy(Car car, String provider, LocalDate startDate, LocalDate endDate) {
         this.car = car; this.provider = provider; this.startDate = startDate; this.endDate = endDate;
@@ -42,4 +46,8 @@ public class InsurancePolicy {
     public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
     public LocalDate getEndDate() { return endDate; }
     public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
+
+    public void setExpiryLogged(boolean b) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
