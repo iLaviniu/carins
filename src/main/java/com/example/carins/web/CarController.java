@@ -6,13 +6,18 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.example.carins.model.Car;
+import com.example.carins.repo.ClaimRepository;
 import com.example.carins.service.CarService;
 import com.example.carins.web.dto.CarDto;
 
@@ -21,9 +26,11 @@ import com.example.carins.web.dto.CarDto;
 public class CarController {
 
     private final CarService service;
+    private final ClaimRepository claimRepository;
 
-    public CarController(CarService service) {
+    public CarController(CarService service, ClaimRepository claimRepository) {
         this.service = service;
+        this.claimRepository = claimRepository;
     }
 
     @GetMapping("/cars")
@@ -56,4 +63,22 @@ public class CarController {
     }
 
     public record InsuranceValidityResponse(Long carId, String date, boolean valid) {}
+
+
+
+    @PostMapping("/cars/{carId}/claims")
+    public ResponseEntity<?> registerClaim(@PathVariable String vin, @Validated @RequestBody ClaimRequest request, UriComponentsBuilder uriBuilder) {
+
+        Car car = service.findByVin(vin);
+
+        InsuranceClaim claim = new InsuranceClaim();
+        claim.setCar(car);
+        claim.setClaimDate(request.getClaimDate());
+        claim.setDescription(request.getDescription());
+        claim.setAmount(request.getAmount());
+
+        InsuranceClaim saved = claimRepository.save(claim);
+
+        return ResponseEntity.created(uriBuilder.path("/api/cars/{carId}/claims/{id}").buildAndExpand(saved.getId(), saved.getId()).toUri()).body(saved);
+    }
 }
