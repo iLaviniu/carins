@@ -1,13 +1,12 @@
 package com.example.carins.service;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.example.carins.model.Car;
 import com.example.carins.repo.CarRepository;
 import com.example.carins.repo.InsurancePolicyRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class CarService {
@@ -32,7 +31,7 @@ public class CarService {
         if(policyRepository.existsActiveOnDate(carId, date)) {
             return true;
         } else {
-            throw new RuntimeException("Car not found");
+            return false;
         }
     }
 }
